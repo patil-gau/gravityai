@@ -1,18 +1,30 @@
 # Development Environment Configuration
 
 environment = "dev"
-aws_region  = "us-east-1"
+project_id  = "gravityai-64e30"
+region      = "asia-south1"
+zone        = "asia-south1-a"
 owner       = "gravity-ai-dev-team"
 
-# Network configuration
-vpc_cidr           = "10.0.0.0/16"
-availability_zones = ["us-east-1a", "us-east-1b"]
+# Firebase configuration
+firebase_project_id = "gravityai-64e30"
+firebase_location   = "asia-south1"
 
-# Application configuration
-app_image_tag = "dev-latest"
-api_image_tag = "dev-latest"
+# Cloud Run configuration
+cloud_run_service_name = "gravity-ai-api-dev"
+container_image        = "gcr.io/gravityai-64e30/gravity-ai-api:dev-latest"
+min_instances          = 0
+max_instances          = 3
+cpu_limit              = "500m"
+memory_limit           = "512Mi"
 
-# Scaling configuration
-min_capacity     = 1
-max_capacity     = 3
-desired_capacity = 1
+# Storage configuration
+storage_bucket_name = "gravity-ai-storage-dev"
+temp_bucket_name    = "gravity-ai-temp-dev"
+
+# Pub/Sub configuration
+pubsub_topics = ["dev-inbound-msg", "dev-digests-daily", "dev-digests-weekly"]
+
+# Firestore configuration
+firestore_database_type = "FIRESTORE_NATIVE"
+firestore_location_id   = "asia-south1"

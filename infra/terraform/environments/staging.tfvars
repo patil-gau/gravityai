@@ -1,18 +1,30 @@
 # Staging Environment Configuration
 
 environment = "staging"
-aws_region  = "us-east-1"
+project_id  = "gravityai-64e30"
+region      = "asia-south1"
+zone        = "asia-south1-a"
 owner       = "gravity-ai-team"
 
-# Network configuration
-vpc_cidr           = "10.1.0.0/16"
-availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+# Firebase configuration
+firebase_project_id = "gravityai-64e30"
+firebase_location   = "asia-south1"
 
-# Application configuration
-app_image_tag = "staging-latest"
-api_image_tag = "staging-latest"
+# Cloud Run configuration
+cloud_run_service_name = "gravity-ai-api-staging"
+container_image        = "gcr.io/gravityai-64e30/gravity-ai-api:staging-latest"
+min_instances          = 1
+max_instances          = 6
+cpu_limit              = "1000m"
+memory_limit           = "1Gi"
 
-# Scaling configuration
-min_capacity     = 2
-max_capacity     = 6
-desired_capacity = 2
+# Storage configuration
+storage_bucket_name = "gravity-ai-storage-staging"
+temp_bucket_name    = "gravity-ai-temp-staging"
+
+# Pub/Sub configuration
+pubsub_topics = ["staging-inbound-msg", "staging-digests-daily", "staging-digests-weekly"]
+
+# Firestore configuration
+firestore_database_type = "FIRESTORE_NATIVE"
+firestore_location_id   = "asia-south1"

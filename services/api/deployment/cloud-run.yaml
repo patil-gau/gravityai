@@ -1,0 +1,65 @@
+# Cloud Run service configuration template
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: gravity-ai-api
+  labels:
+    project: gravity-ai
+    service: api
+    environment: production
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/execution-environment: gen2
+spec:
+  template:
+    metadata:
+      labels:
+        project: gravity-ai
+        service: api
+        environment: production
+      annotations:
+        autoscaling.knative.dev/maxScale: "10"
+        autoscaling.knative.dev/minScale: "0"
+        run.googleapis.com/cpu-throttling: "true"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      containers:
+      - image: gcr.io/gravityai-64e30/gravity-ai-api:latest
+        ports:
+        - name: http1
+          containerPort: 8000
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: PORT
+          value: "8000"
+        - name: ALLOWED_ORIGINS
+          value: "https://gravity-ai.com,https://gravityai-64e30.web.app"
+        resources:
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+  traffic:
+  - percent: 100
+    latestRevision: true

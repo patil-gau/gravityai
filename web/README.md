@@ -263,6 +263,110 @@ NEXT_PUBLIC_STORAGE_BASE_URL=https://firebasestorage.googleapis.com/v0/b/gravity
 - Configure custom domain and SSL
 - Set up monitoring and alerting for Firebase services
 
+## Architecture Decisions
+
+### App Router Choice
+
+**Decision:** Using Next.js 14 App Router instead of Pages Router
+
+**Rationale:**
+- **Modern React Patterns:** Built-in support for React Server Components, reducing client-side JavaScript bundle
+- **Improved Performance:** Server-side rendering by default with selective client-side hydration
+- **Better Developer Experience:** Co-located layouts, loading states, and error boundaries
+- **Future-Proof:** App Router is the recommended approach for new Next.js applications
+- **SEO Benefits:** Enhanced SEO capabilities with automatic metadata management and server-side rendering
+
+**Trade-offs:**
+- Learning curve for developers familiar with Pages Router
+- Some third-party libraries may need updates for App Router compatibility
+
+### State Management Choice
+
+**Decision:** React Query (@tanstack/react-query) for server state management
+
+**Rationale:**
+- **Server State Focus:** Excellent caching, synchronization, and background updates for API data
+- **Minimal Boilerplate:** Reduces complexity compared to Redux for server state management  
+- **Built-in Features:** Automatic background refetching, optimistic updates, offline support
+- **Performance:** Intelligent request deduplication and stale-while-revalidate caching
+- **Developer Experience:** Great DevTools and error handling
+
+**For Client State:** Using React's built-in state management (useState, useContext) for simple UI state
+
+**Trade-offs:**
+- Additional dependency vs. using only React built-ins
+- Learning curve for team members unfamiliar with React Query patterns
+
+### Protected Routes Implementation
+
+**Decision:** AuthGate wrapper component with Firebase Auth integration
+
+**Approach:**
+- **Route Protection:** `/app/*` routes wrapped with AuthGate component
+- **Authentication State:** Firebase Auth state monitoring with real-time updates
+- **Loading States:** Graceful loading indicators during auth state determination
+- **Redirect Logic:** Automatic redirection to sign-in for unauthenticated users
+- **Nested Protection:** Layout-level protection ensures all child routes are secured
+
+**Rendering Strategy:**
+1. **Server-Side:** Initial HTML rendered without protected content
+2. **Client Hydration:** Firebase Auth state checked on client-side
+3. **Conditional Rendering:** Protected content displayed only after authentication verification
+4. **Loading State:** Spinner shown during authentication state determination
+5. **Redirect:** Automatic navigation to `/auth/signin` for unauthenticated users
+
+**Benefits:**
+- Security: No protected content sent to browser before authentication
+- Performance: Lazy loading of app content after authentication
+- User Experience: Smooth transitions between auth states
+
+## Post-Installation Checklist
+
+After a clean install and setup, verify the following renders correctly:
+
+### ✅ Basic Application Structure
+- [ ] **Home page loads** at `http://localhost:3000` with marketing layout
+- [ ] **Navigation header** displays with "Gravity AI" branding and auth buttons
+- [ ] **Footer** renders with proper links and company information
+- [ ] **Tailwind CSS** styles are applied (proper fonts, colors, spacing)
+
+### ✅ Marketing Routes
+- [ ] **Home page** (`/`) displays hero section, features, and CTA
+- [ ] **Pricing page** (`/pricing`) shows pricing cards with plans
+- [ ] **Privacy page** (`/privacy`) displays privacy policy content
+- [ ] **Route transitions** work smoothly between marketing pages
+
+### ✅ Protected App Routes (Demo Mode)
+- [ ] **App dashboard** (`/app/dashboard`) loads with auth gate (demo user)
+- [ ] **Sidebar navigation** displays all app sections with active state
+- [ ] **App header** shows user info and notifications
+- [ ] **Dashboard stats** render with placeholder data
+- [ ] **Quick actions** and recent activity sections display
+
+### ✅ App Section Placeholders
+- [ ] **Journals page** (`/app/journals`) shows empty state with create button
+- [ ] **Todos page** (`/app/todos`) displays filters and empty todo list
+- [ ] **Calendar page** (`/app/calendar`) renders calendar layout and sidebar
+- [ ] **Documents page** (`/app/documents`) shows document grid placeholder
+- [ ] **Settings page** (`/app/settings`) displays settings tabs and sections
+
+### ✅ Component Library
+- [ ] **Button variants** (primary, secondary, ghost, outline) render correctly
+- [ ] **Card components** display with proper styling and hierarchy
+- [ ] **Typography** uses Inter font and consistent sizing
+- [ ] **Color system** applies brand colors (blue/brand-600) consistently
+
+### ✅ Development Features
+- [ ] **TypeScript** compilation succeeds without errors
+- [ ] **ESLint** passes without violations
+- [ ] **Hot reload** works for both pages and components
+- [ ] **React Query DevTools** available in development mode
+
+### ✅ Build and Production
+- [ ] **Production build** (`npm run build`) completes successfully
+- [ ] **Static assets** are properly optimized and served
+- [ ] **Metadata** appears correctly in browser tabs and social previews
+
 ## API Integration
 
 The frontend communicates with the backend API service. API URL is configurable via environment variables and defaults to `http://localhost:8000` for development.
