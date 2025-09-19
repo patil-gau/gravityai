@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./web
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - API_URL=${API_URL:-http://api:8000}
+    depends_on:
+      - api
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+
+  api:
+    build: ./services/api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - PORT=8000
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ./services/api:/app
+      - /app/node_modules
+
+networks:
+  default:
+    name: gravity-ai-network
