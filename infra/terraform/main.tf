@@ -4,37 +4,48 @@ terraform {
   required_version = ">= 1.0"
   
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
       version = "~> 5.0"
     }
   }
 
   # Backend configuration for state management
-  # backend "s3" {
+  # backend "gcs" {
   #   bucket = "gravity-ai-terraform-state"
-  #   key    = "environments/${var.environment}/terraform.tfstate"
-  #   region = "us-east-1"
-  #   
-  #   dynamodb_table = "gravity-ai-terraform-locks"
-  #   encrypt        = true
+  #   prefix = "environments/${var.environment}/terraform.tfstate"
   # }
 }
 
 # Provider configuration
-provider "aws" {
-  region = var.aws_region
+provider "google" {
+  project = var.project_id
+  region  = var.region
 
-  default_tags {
-    tags = {
-      Project     = "gravity-ai"
-      Environment = var.environment
-      ManagedBy   = "terraform"
-      Owner       = var.owner
-    }
+  default_labels = {
+    project     = "gravity-ai"
+    environment = var.environment
+    managed-by  = "terraform"
+    owner       = var.owner
+  }
+}
+
+provider "google-beta" {
+  project = var.project_id
+  region  = var.region
+
+  default_labels = {
+    project     = "gravity-ai"
+    environment = var.environment
+    managed-by  = "terraform"
+    owner       = var.owner
   }
 }
 
 # Data sources
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
+data "google_client_config" "current" {}
+data "google_project" "current" {}

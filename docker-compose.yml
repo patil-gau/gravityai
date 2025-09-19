@@ -2,30 +2,46 @@ version: '3.8'
 
 services:
   web:
-    build: ./web
+    build: 
+      context: ./web
+      dockerfile: Dockerfile
     ports:
       - "${WEB_PORT:-3000}:3000"
-    environment:
-      - NODE_ENV=${NODE_ENV:-development}
-      - API_URL=${API_URL:-http://api:8000}
+    env_file:
+      - .env                # Docker orchestration variables
+      - ./web/.env.local    # Frontend-specific variables
     depends_on:
       - api
-    volumes:
-      - ./web:/app
-      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - gravity-ai-network
+    restart: unless-stopped
 
   api:
-    build: ./services/api
+    build: 
+      context: ./services/api
+      dockerfile: Dockerfile
     ports:
       - "${API_PORT:-8000}:8000"
+    env_file:
+      - .env                      # Docker orchestration variables
+      - ./services/api/.env       # Backend-specific variables
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
+      - ENVIRONMENT=development
       - PORT=8000
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-    volumes:
-      - ./services/api:/app
-      - /app/node_modules
+      # Base64 credentials will be decoded in the container
+      - GOOGLE_CLOUD_CREDENTIALS_BASE64=${GOOGLE_CLOUD_CREDENTIALS_BASE64}
+    networks:
+      - gravity-ai-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
 networks:
-  default:
-    name: gravity-ai-network
+  gravity-ai-network:
+    driver: bridge
